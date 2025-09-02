@@ -1,8 +1,13 @@
+"use client";
+
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { FcGoogle } from "react-icons/fc";
 import { loginUser } from "../services/userServices/UserService";
 import toast from "react-hot-toast";
-import { useRouter } from "next/router";
+import { setAuth } from "../../store/authSlice";
+import { useDispatch } from "react-redux";
+
 
 interface LoginFormProps {
   onSwitchToRegister: () => void;
@@ -13,15 +18,23 @@ export default function LoginForm({ onSwitchToRegister, onClose }: LoginFormProp
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const router = useRouter();
+  const dispatch = useDispatch();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
-      const result = await loginUser({email, password});
+      const result = await loginUser({email, password}) as {
+        success: boolean;
+        token: string;
+        user: { role: string };
+        message: string;
+      };
       if (!result.success) throw new Error(result.message);
 
-      localStorage.setItem("token", result.token);
+      dispatch(setAuth({ token: result.token, role: result.user.role }));
+
+      // localStorage.setItem("token", result.token);
 
       setEmail("");
       setPassword("");
@@ -33,7 +46,7 @@ export default function LoginForm({ onSwitchToRegister, onClose }: LoginFormProp
         router.push("/authPage/landing");
       }
       
-      toast.success("Login successfully", {
+      toast.success(result.message, {
         duration: 3000,
         position: "top-right",
         style: {

@@ -1,4 +1,4 @@
-import AdminHome from "../../components/adminHome";
+import AdminHome from "../../adminPages/adminHome";
 
 
 export default function adminDashboard() {
