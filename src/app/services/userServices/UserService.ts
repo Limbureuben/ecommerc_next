@@ -3,27 +3,27 @@ import { api } from '../api/api';
 import { postRequest } from '../Helper/httpService';
 
 
-// export async function loginUser(data: LoginData) {
-//     const res = await fetch(api.login, {
-//         method: 'POST',
-//         headers: {
-//             "Content-Type": "application/json",
-//         },
-//         body: JSON.stringify(data),
-//     });
+export async function loginUser(data: LoginData) {
+    const res = await fetch(api.login, {
+        method: 'POST',
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+    });
 
-//     if (!res.ok) {
-//         const err = await res.json();
-//         throw new Error(err.message || "Login failed");
-//     }
+    if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.message || "Login failed");
+    }
 
-//     return res.json();
-// }
+    return res.json();
+}
 
 export async function registerUser(data: RegisterData) {
   return postRequest(api.register, data);
 }
 
-export async function loginUser(data: LoginData) {
-  return postRequest(api.login, data);
-}
+// export async function loginUser(data: LoginData) {
+//   return postRequest(api.login, data);
+// }

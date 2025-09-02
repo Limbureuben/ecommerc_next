@@ -2,6 +2,7 @@ import { useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 import { loginUser } from "../services/userServices/UserService";
 import toast from "react-hot-toast";
+import { useRouter } from "next/router";
 
 interface LoginFormProps {
   onSwitchToRegister: () => void;
@@ -11,13 +12,27 @@ interface LoginFormProps {
 export default function LoginForm({ onSwitchToRegister, onClose }: LoginFormProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
       const result = await loginUser({email, password});
-      console.log("These are the login data", result)
+      if (!result.success) throw new Error(result.message);
+
+      localStorage.setItem("token", result.token);
+
+      setEmail("");
+      setPassword("");
+      const role = result.user.role;
+      console.log('The user role', role);
+      if (role === "staff") {
+      router.push("/admin/dashboard");
+      } else {
+        router.push("/authPage/landing");
+      }
+      
       toast.success("Login successfully", {
         duration: 3000,
         position: "top-right",
