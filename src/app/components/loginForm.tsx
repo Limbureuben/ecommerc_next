@@ -7,6 +7,7 @@ import { loginUser } from "../services/userServices/UserService";
 import toast from "react-hot-toast";
 import { setAuth } from "../../store/authSlice";
 import { useDispatch } from "react-redux";
+import { signIn } from "next-auth/react";
 
 
 interface LoginFormProps {
@@ -115,6 +116,7 @@ export default function LoginForm({ onSwitchToRegister, onClose }: LoginFormProp
       {/* Continue with Google */}
       <button
         type="button"
+        onClick={() => signIn("google", { callbackUrl: "/authPage/login" })}
         className="w-full flex items-center justify-center gap-3 rounded-1xl border border-gray-300 py-3 text-gray-700 hover:bg-gray-100 transition cursor-pointer"
       >
         <FcGoogle size={22} />
