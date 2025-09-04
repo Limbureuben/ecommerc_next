@@ -42,8 +42,8 @@ export default function Sidebar({ sidebarOpen, activePage, setActivePage, toggle
                       : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                   }`}
                 >
-                  <Icon className="h-5 w-5 flex-shrink-0" />
-                  {sidebarOpen && <span className="font-medium">{item.label}</span>}
+                  <Icon className="h-5 w-5 flex-shrink-0 cursor-pointer" />
+                  {sidebarOpen && <span className="font-medium  cursor-pointer">{item.label}</span>}
                 </button>
               </li>
             );
