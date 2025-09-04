@@ -5,5 +5,8 @@ export const api = {
     login: `${API_BASE_URL}/users/login`,
     registerProduct: `${API_BASE_URL}/products/product-register`,
     getProduct: `${API_BASE_URL}/products/get-all-products`,
-    profile: `${API_BASE_URL}/users/profile`
+    deleteProduct: `${API_BASE_URL}/products/delete-product`,
+    updateProduct: `${API_BASE_URL}/products/update-product`,
+    profile: `${API_BASE_URL}/users/profile`,
+    stats: `${API_BASE_URL}/users/stats`
 }

@@ -1,6 +1,8 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Home, Package, ShoppingCart, Users, BarChart3, Settings, User, X, Menu } from "lucide-react";
+import toast from "react-hot-toast";
+
 
 interface SidebarProps {
   sidebarOpen: boolean;
@@ -8,7 +10,8 @@ interface SidebarProps {
   setActivePage: (page: string) => void;
   toggleSidebar: () => void;
 }
-
+import { fetchProfile } from "../services/userServices/UserService";
+import { ProfileData } from "../model/UserModel";
 const menuItems = [
   { id: "dashboard", label: "Dashboard", icon: Home },
   { id: "products", label: "Products", icon: Package },
@@ -19,6 +22,26 @@ const menuItems = [
 ];
 
 export default function Sidebar({ sidebarOpen, activePage, setActivePage, toggleSidebar }: SidebarProps) {
+    const [user, setUser] = useState<ProfileData | null>(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() =>{
+      const loadProfile = async () => {
+      try {
+        setLoading(true);
+        const data = await fetchProfile();
+        setUser(data.user);
+      } catch (err) {
+        toast.error(err.message || "Failed to load profile");
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadProfile();
+    }, []);
+
+    if (loading) return <p>Loading profile...</p>;
+    if (!user) return <p>No profile data found</p>;
   return (
     <div className={`bg-white shadow-xl transition-all duration-300 ${sidebarOpen ? "w-64" : "w-16"} flex flex-col`}>
       <div className="p-4 border-b border-gray-200 flex items-center justify-between">
@@ -36,10 +59,10 @@ export default function Sidebar({ sidebarOpen, activePage, setActivePage, toggle
               <li key={item.id}>
                 <button
                   onClick={() => setActivePage(item.id)}
-                  className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg ${
+                  className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg cursor-pointer ${
                     activePage === item.id
-                      ? "bg-blue-600 text-white"
-                      : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                      ? "bg-gradient-to-r from-purple-600 to-orange-500 text-white"
+                      : "text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors"
                   }`}
                 >
                   <Icon className="h-5 w-5 flex-shrink-0 cursor-pointer" />
@@ -58,7 +81,7 @@ export default function Sidebar({ sidebarOpen, activePage, setActivePage, toggle
           </div>
           <div>
             <p className="text-sm font-medium text-gray-900">Admin User</p>
-            <p className="text-xs text-gray-500">admin@store.com</p>
+            <p className="text-xs text-gray-500">{user.email}</p>
           </div>
         </div>
       )}

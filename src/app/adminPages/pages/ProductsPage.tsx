@@ -278,9 +278,11 @@
 
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { fetchProducts, registerProduct } from "../../services/productService/productServices";
+import { deleteProduct, fetchProducts, registerProduct, updateProduct } from "../../services/productService/productServices";
 import { Product } from "../../model/UserModel";
 import Image from "next/image";
+import Swal from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
 
 const ProductsPage = () => {
   const [showForm, setShowForm] = useState(false);
@@ -288,6 +290,7 @@ const ProductsPage = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("All Categories");
+  const MySwal = withReactContent(Swal);
 
   const [name, setName] = useState("");
   const [category, setCategory] = useState("");
@@ -295,6 +298,8 @@ const ProductsPage = () => {
   const [description, setDescription] = useState("");
   const [image, setImage] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+
 
   // Fetch products from backend
   useEffect(() => {
@@ -334,39 +339,146 @@ const ProductsPage = () => {
   };
 
   // Handle form submission
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // const handleSubmit = async (e: React.FormEvent) => {
+  //   e.preventDefault();
 
-    if (!category) {
-      toast.error("Please select a category");
-      return;
+  //   if (!category) {
+  //     toast.error("Please select a category");
+  //     return;
+  //   }
+
+  //   const formData = new FormData();
+  //   formData.append("name", name);
+  //   formData.append("category", category);
+  //   formData.append("price", String(price));
+  //   formData.append("description", description);
+  //   if (image) formData.append("image", image);
+
+  //   try {
+  //     setLoading(true);
+  //     const res = await registerProduct(formData);
+  //     toast.success(res.message || "Product saved successfully");
+
+  //     // Refresh product list
+  //     const updated: Product[] = await fetchProducts();
+  //     setProducts(updated);
+  //     setFilteredProducts(updated);
+
+  //     resetForm();
+  //     setShowForm(false);
+  //   } catch (err) {
+  //     toast.error(err.message || "Failed to save product");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+      e.preventDefault();
+
+      if (!category) {
+        toast.error("Please select a category");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("name", name);
+      formData.append("category", category);
+      formData.append("price", String(price));
+      formData.append("description", description);
+      if (image) formData.append("image", image);
+
+      try {
+        setLoading(true);
+
+        if (editingId) {
+          // UPDATE existing product
+          const res = await updateProduct(editingId, formData); // PUT /update-product/:id
+          toast.success(res.message || "Product updated successfully");
+        } else {
+          // CREATE new product
+          const res = await registerProduct(formData); // POST /register-product
+          toast.success(res.message || "Product saved successfully");
+        }
+
+        // Refresh product list
+        const updatedProducts: Product[] = await fetchProducts();
+        setProducts(updatedProducts);
+        setFilteredProducts(updatedProducts);
+
+        resetForm();
+        setShowForm(false);
+        setEditingId(null); // reset edit state
+      } catch (err) {
+        toast.error(err.message || "Failed to save product");
+      } finally {
+        setLoading(false);
+      }
+  };
+
+
+  const handleDeleteProduct = async (id: string) => {
+  const result = await MySwal.fire({
+    title: "Are you sure?",
+    text: "You won't be able to revert this!",
+    showCancelButton: true,
+    confirmButtonText: "Yes, delete it!",
+    cancelButtonText: "Cancel",
+    buttonsStyling: false, // disable default styling
+    customClass: {
+      confirmButton: "bg-gradient-to-r from-purple-600 to-orange-500 text-white px-6 py-2 rounded-lg font-semibold hover:opacity-90 transition cursor-pointer",
+      cancelButton: "bg-gray-200 text-gray-800 px-6 py-2 rounded-lg font-semibold hover:opacity-80 transition ml-3 cursor-pointer" // added ml-3 for spacing
     }
+  });
 
-    const formData = new FormData();
-    formData.append("name", name);
-    formData.append("category", category);
-    formData.append("price", String(price));
-    formData.append("description", description);
-    if (image) formData.append("image", image);
-
+  if (result.isConfirmed) {
     try {
-      setLoading(true);
-      const res = await registerProduct(formData);
-      toast.success(res.message || "Product saved successfully");
+      await deleteProduct(id); // your service call
+      toast.success("Product deleted successfully", {
+        duration: 3000,
+        position: "top-right",
+        style: {
+          background: "#4ade80",
+          color: "#fff",
+          padding: "12px 20px",
+          borderRadius: "4px",
+          fontWeight: "bold",
+        },
+      });
 
-      // Refresh product list
-      const updated: Product[] = await fetchProducts();
+      const updated = await fetchProducts();
       setProducts(updated);
       setFilteredProducts(updated);
 
-      resetForm();
-      setShowForm(false);
     } catch (err) {
-      toast.error(err.message || "Failed to save product");
-    } finally {
-      setLoading(false);
+      toast.error(err.message || "Failed to delete product");
     }
+  }
+};
+
+
+  const handleUpdateProduct = (product: Product) => {
+    setName(product.name);
+    setCategory(product.category);
+    setPrice(product.price);
+    setDescription(product.description);
+    setImage(null); // keep current image, optional to allow new upload
+    setEditingId(product._id || null);
+    setShowForm(true);
   };
+
+
+//  const handleUpdateProduct = (product: Product) => {
+//   setName(product.name);
+//   setCategory(product.category);
+//   setPrice(product.price);
+//   setDescription(product.description);
+//   setImage(null); // keep current image or allow new upload
+//   setEditingProductId(product._id || null); // set the product being edited
+//   setShowForm(true);
+// };
+
+
 
   return (
     <div className="space-y-6">
@@ -466,13 +578,13 @@ const ProductsPage = () => {
                     <td className="py-3 px-4 flex gap-2">
                       <button
                         className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600 cursor-pointer"
-                        
+                        onClick={() => handleUpdateProduct(p)}
                       >
                         Update
                       </button>
                       <button
                         className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 cursor-pointer"
-                        
+                        onClick={() => handleDeleteProduct(p._id)}
                       >
                         Delete
                       </button>

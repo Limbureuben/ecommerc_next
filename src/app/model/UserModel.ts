@@ -21,3 +21,12 @@ export interface Product {
   createdAt?: string;
   updatedAt?: string;
 }
+
+
+// model/UserModel.ts
+export interface ProfileData {
+  _id: string;
+  name: string;
+  email: string;
+  role?: string;
+}
