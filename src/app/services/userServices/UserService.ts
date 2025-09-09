@@ -24,10 +24,6 @@ export async function registerUser(data: RegisterData) {
   return postRequest(api.register, data);
 }
 
-// export async function loginUser(data: LoginData) {
-//   return postRequest(api.login, data);
-// }
-
 export async function fetchProfile() {
     const token = localStorage.getItem("token");
     if (!token) throw new Error("Not authenticated");
