@@ -5,8 +5,6 @@ import { useRouter } from "next/navigation";
 import { FcGoogle } from "react-icons/fc";
 import { loginUser } from "../services/userServices/UserService";
 import toast from "react-hot-toast";
-import { setAuth } from "../../store/authSlice";
-import { useDispatch } from "react-redux";
 import { signIn } from "next-auth/react";
 
 
@@ -19,7 +17,6 @@ export default function LoginForm({ onSwitchToRegister, onClose }: LoginFormProp
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const router = useRouter();
-  const dispatch = useDispatch();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();

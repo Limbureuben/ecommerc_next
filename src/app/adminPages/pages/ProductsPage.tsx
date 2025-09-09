@@ -394,7 +394,17 @@ const ProductsPage = () => {
         if (editingId) {
           // UPDATE existing product
           const res = await updateProduct(editingId, formData); // PUT /update-product/:id
-          toast.success(res.message || "Product updated successfully");
+          toast.success(res.message || "Product updated successfully", {
+            duration: 3000,
+            position: "top-right",
+            style: {
+            background: "#4ade80",
+            color: "#fff",
+            padding: "12px 20px",
+            borderRadius: "4px",
+            fontWeight: "bold",
+          },
+          });
         } else {
           // CREATE new product
           const res = await registerProduct(formData); // POST /register-product
@@ -466,19 +476,6 @@ const ProductsPage = () => {
     setEditingId(product._id || null);
     setShowForm(true);
   };
-
-
-//  const handleUpdateProduct = (product: Product) => {
-//   setName(product.name);
-//   setCategory(product.category);
-//   setPrice(product.price);
-//   setDescription(product.description);
-//   setImage(null); // keep current image or allow new upload
-//   setEditingProductId(product._id || null); // set the product being edited
-//   setShowForm(true);
-// };
-
-
 
   return (
     <div className="space-y-6">
