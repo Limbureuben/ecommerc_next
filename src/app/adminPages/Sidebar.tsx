@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { Home, Package, ShoppingCart, Users, BarChart3, Settings, User, X, Menu } from "lucide-react";
+import { Home, Package, ShoppingCart, Users, BarChart3, Settings, User, X, Menu, LogOut } from "lucide-react";
 import toast from "react-hot-toast";
 
 
@@ -12,6 +12,7 @@ interface SidebarProps {
 }
 import { fetchProfile } from "../services/userServices/UserService";
 import { ProfileData } from "../model/UserModel";
+import { useRouter } from "next/router";
 const menuItems = [
   { id: "dashboard", label: "Dashboard", icon: Home },
   { id: "products", label: "Products", icon: Package },
@@ -19,11 +20,13 @@ const menuItems = [
   { id: "customers", label: "Customers", icon: Users },
   { id: "analytics", label: "Analytics", icon: BarChart3 },
   { id: "settings", label: "Settings", icon: Settings },
+  { id: "logout", label: "logout", icon: LogOut },
 ];
 
 export default function Sidebar({ sidebarOpen, activePage, setActivePage, toggleSidebar }: SidebarProps) {
     const [user, setUser] = useState<ProfileData | null>(null);
     const [loading, setLoading] = useState(true);
+    const router = useRouter();
 
     useEffect(() =>{
       const loadProfile = async () => {
@@ -40,10 +43,27 @@ export default function Sidebar({ sidebarOpen, activePage, setActivePage, toggle
     loadProfile();
     }, []);
 
+    const handleLogout = () => {
+      localStorage.removeItem('token');
+      router.push('/authPage/landing');
+      toast.success('Logout successful', {
+        duration: 3000,
+        position: "top-right",
+        style: {
+        background: "#4ade80",
+        color: "#fff",
+        padding: "12px 20px",
+        borderRadius: "4px",
+        fontWeight: "bold",
+      },
+      });
+    }
+
     if (loading) return <p>Loading profile...</p>;
     if (!user) return <p>No profile data found</p>;
   return (
     <div className={`bg-white shadow-xl transition-all duration-300 ${sidebarOpen ? "w-64" : "w-16"} flex flex-col`}>
+      {/* Header */}
       <div className="p-4 border-b border-gray-200 flex items-center justify-between">
         {sidebarOpen && <h2 className="text-xl font-bold text-gray-900">E-Store Admin</h2>}
         <button onClick={toggleSidebar} className="p-2 rounded-lg hover:bg-gray-100">
@@ -51,6 +71,7 @@ export default function Sidebar({ sidebarOpen, activePage, setActivePage, toggle
         </button>
       </div>
 
+      {/* Navigation */}
       <nav className="flex-1 p-4">
         <ul className="space-y-2">
           {menuItems.map((item) => {
@@ -58,15 +79,15 @@ export default function Sidebar({ sidebarOpen, activePage, setActivePage, toggle
             return (
               <li key={item.id}>
                 <button
-                  onClick={() => setActivePage(item.id)}
+                  onClick={() => (item.id === "logout" ? handleLogout() : setActivePage(item.id))}
                   className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg cursor-pointer ${
                     activePage === item.id
                       ? "bg-gradient-to-r from-purple-600 to-orange-500 text-white"
                       : "text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors"
                   }`}
                 >
-                  <Icon className="h-5 w-5 flex-shrink-0 cursor-pointer" />
-                  {sidebarOpen && <span className="font-medium  cursor-pointer">{item.label}</span>}
+                  <Icon className="h-5 w-5 flex-shrink-0" />
+                  {sidebarOpen && <span className="font-medium">{item.label}</span>}
                 </button>
               </li>
             );
@@ -74,6 +95,7 @@ export default function Sidebar({ sidebarOpen, activePage, setActivePage, toggle
         </ul>
       </nav>
 
+      {/* User Footer */}
       {sidebarOpen && (
         <div className="p-4 border-t border-gray-200 flex items-center space-x-3">
           <div className="h-8 w-8 bg-gray-300 rounded-full flex items-center justify-center">
