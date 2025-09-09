@@ -12,7 +12,7 @@ interface SidebarProps {
 }
 import { fetchProfile } from "../services/userServices/UserService";
 import { ProfileData } from "../model/UserModel";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 const menuItems = [
   { id: "dashboard", label: "Dashboard", icon: Home },
   { id: "products", label: "Products", icon: Package },
