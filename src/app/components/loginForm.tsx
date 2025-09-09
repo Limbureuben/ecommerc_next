@@ -44,7 +44,7 @@ export default function LoginForm({ onSwitchToRegister, onClose }: LoginFormProp
       if (role === "staff") {
       router.push("/admin/dashboard");
       } else {
-        router.push("/authPage/landing");
+        router.push("/products/product");
       }
       
       toast.success(result.message, {

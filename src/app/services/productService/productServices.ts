@@ -1,4 +1,4 @@
-import { Product } from "../../model/UserModel";
+import { CheckoutPayload, Product } from "../../model/UserModel";
 import { api } from "../api/api";
 
 
@@ -65,4 +65,25 @@ export async function updateProduct(id: string, formData: FormData) {
         throw new Error(err.message || "Product update failed");
     }
     return res.json();
+}
+
+
+
+export async function startCheckout(payload: CheckoutPayload) {
+  const res = await fetch("/api/checkout", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) {
+    let msg = "Failed to create checkout session";
+    try {
+      const err = await res.json();
+      msg = err?.message || msg;
+    } catch {}
+    throw new Error(msg);
+  }
+
+  return res.json(); // { url: string }
 }

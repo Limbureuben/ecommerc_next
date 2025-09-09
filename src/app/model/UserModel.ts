@@ -30,3 +30,11 @@ export interface ProfileData {
   email: string;
   role?: string;
 }
+
+
+export interface CheckoutPayload {
+  productId: string;
+  name: string;
+  amountCents: number; // Stripe needs integer cents
+  image: string | null;
+}
