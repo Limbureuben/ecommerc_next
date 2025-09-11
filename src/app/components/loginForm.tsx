@@ -30,8 +30,6 @@ export default function LoginForm({ onSwitchToRegister, onClose }: LoginFormProp
       };
       if (!result.success) throw new Error(result.message);
 
-      // dispatch(setAuth({ token: result.token, role: result.user.role }));
-
       localStorage.setItem("token", result.token);
 
       setEmail("");
